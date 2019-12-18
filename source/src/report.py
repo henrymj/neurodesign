@@ -71,6 +71,26 @@ def make_report(POP,outfile="NeuroDesign.pdf"):
 
     Story.append(PageBreak())
 
+    #ADDED BY HJ
+    corr='This is the covariance matrix between the top {0} designs: {1}'.format(POP.outdes,str(POP.out)[1:-1])
+    Story.append(Paragraph(corr, styles["Normal"]))
+
+    fig = plt.figure(figsize=(6, 6))
+    plt.imshow(POP.cov,interpolation="nearest")
+    plt.colorbar()
+    imgdata = cStringIO.StringIO()
+    fig.savefig(imgdata, format='pdf')
+    imgdata.seek(0)  # rewind the data
+
+    reader = form_xo_reader
+    image = reader(imgdata)
+    img = PdfImage(image,width=300,height=250)
+    Story.append(img)
+
+    Story.append(PageBreak())
+
+    #
+
     Story.append(Paragraph("Selected designs", styles["Heading2"]))
     Story.append(Spacer(1, 12))
 
