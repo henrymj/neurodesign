@@ -57,7 +57,7 @@ def make_report(POP,outfile="NeuroDesign.pdf"):
     corr='During the optimisation, the designs are mixed with each other to find better combinations.  As such, the designs can look very similar. Actually, the genetic algorithm uses natural selection as a basis, and as such, the designs can be clustered in families.  This is the covariance matrix between the final {0} designs'.format(POP.G)
     Story.append(Paragraph(corr, styles["Normal"]))
 
-    fig = plt.figure(figsize=(6, 6))
+    fig = plt.figure(figsize=(12, 12)) #changed from (6,6) by HJ 
     plt.imshow(POP.cov,interpolation="nearest")
     plt.colorbar()
     imgdata = cStringIO.StringIO()
@@ -68,6 +68,9 @@ def make_report(POP,outfile="NeuroDesign.pdf"):
     image = reader(imgdata)
     img = PdfImage(image,width=300,height=250)
     Story.append(img)
+
+    fig = plt.gcf() #ADDED by HJ
+    plt.close()
 
     Story.append(PageBreak())
 
@@ -76,7 +79,7 @@ def make_report(POP,outfile="NeuroDesign.pdf"):
     Story.append(Paragraph(corr, styles["Normal"]))
 
     fig = plt.figure(figsize=(6, 6))
-    plt.imshow(POP.cov,interpolation="nearest")
+    plt.imshow(POP.bcov,interpolation="nearest")
     plt.colorbar()
     imgdata = cStringIO.StringIO()
     fig.savefig(imgdata, format='pdf')
@@ -87,9 +90,51 @@ def make_report(POP,outfile="NeuroDesign.pdf"):
     img = PdfImage(image,width=300,height=250)
     Story.append(img)
 
-    Story.append(PageBreak())
+    fig = plt.gcf()
+    plt.close()
 
-    #
+    Story.append(PageBreak())
+    ###
+
+    #ADDED BY HJ - add distances to matrix
+    corr='This is the covariance matrix between the top {0} designs: {1}'.format(POP.outdes,str(POP.out)[1:-1])
+    Story.append(Paragraph(corr, styles["Normal"]))
+
+    fig = plt.figure(figsize=(13, 13))
+    c = plt.pcolor(POP.bcov)
+    plt.gca().invert_yaxis() #corrects so that identity diagonal will run from top-left to bottom-right instead of bottom-left to top-right
+
+    ### - modified from: https://stackoverflow.com/a/25074150
+    def show_values(c, fmt="%.5f", **kw):
+        from itertools import izip
+        c.update_scalarmappable()
+        ax = c.axes
+        for p, color, value in izip(c.get_paths(), c.get_facecolors(), c.get_array()):
+            x, y = p.vertices[:-2, :].mean(0)
+            if np.all(color[:3] > 0.5):
+                color = (0.0, 0.0, 0.0)
+            else:
+                color = (1.0, 1.0, 1.0)
+            ax.text(x, y, fmt % value, ha="center", va="center", color=color, **kw)
+
+    show_values(c)
+    plt.colorbar(c)
+    ######
+
+    imgdata = cStringIO.StringIO()
+    fig.savefig(imgdata, format='pdf')
+    imgdata.seek(0)  # rewind the data
+
+    reader = form_xo_reader
+    image = reader(imgdata)
+    img = PdfImage(image,width=300,height=250)
+    Story.append(img)
+
+    fig = plt.gcf()
+    plt.close()
+
+    Story.append(PageBreak())
+    ###
 
     Story.append(Paragraph("Selected designs", styles["Heading2"]))
     Story.append(Spacer(1, 12))

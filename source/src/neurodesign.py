@@ -619,7 +619,7 @@ class optimisation(object):
         self.optima = []
         self.bestdesign = None
         self.cov = None
-        self.bcov = None
+        self.bcov = None #ADDED BY HJ
 
     def change_seed(self):
         '''
@@ -959,13 +959,14 @@ class optimisation(object):
         self.clus = cl
 
         signals = [x.Xconv for x in self.designs]
-        co = self.pearsonr(signals,3)
+        co = self.pearsonr(signals,self.exp.n_stimuli)
         self.cov = co
 
         #added by henry jones to address covariance of top n=outdes designs
         best_signals = [x.Xconv for idx,x in enumerate(self.designs) if idx in self.out]
-        bco = self.pearsonr(best_signals,3) 
+        bco = self.pearsonr(best_signals,self.exp.n_stimuli) 
         self.bcov = bco
+        ###############
 
         return self
 
