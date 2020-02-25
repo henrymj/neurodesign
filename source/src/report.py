@@ -71,6 +71,8 @@ def make_report(POP,outfile="NeuroDesign.pdf"):
 
     fig = plt.gcf() #ADDED by HJ
     plt.close()
+    
+    np.save(os.path.join(POP.folder, 'full_covariances.npy'), POP.cov)
 
     Story.append(PageBreak())
 
@@ -132,6 +134,8 @@ def make_report(POP,outfile="NeuroDesign.pdf"):
 
     fig = plt.gcf()
     plt.close()
+    
+    np.save(os.path.join(POP.folder, 'top_covariances.npy'), POP.bcov)
 
     Story.append(PageBreak())
     ###
